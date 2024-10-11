@@ -7,11 +7,14 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+CurlHelper::CurlHelper() {}
+
 CurlHelper::CurlHelper(const std::string &base_url) : base_url(base_url) {}
 
 void CurlHelper::post_request(
-    const std::string &path, const std::string &opts, const std::string &header,
-    const std::vector<std::pair<std::string, std::string>> &data) {
+    const std::string &path, const std::optional<std::string> &token,
+    const std::optional<std::vector<std::pair<std::string, std::string>>>
+        &data) {
     curl_global_init(CURL_GLOBAL_ALL);
 
     curl = curl_easy_init();
@@ -19,20 +22,38 @@ void CurlHelper::post_request(
         curl_easy_setopt(curl, CURLOPT_URL, create_curl_url(path).c_str());
 
         struct curl_slist *list = NULL;
-        list = curl_slist_append(list, header.c_str());
         list = curl_slist_append(list, "Content-Type: application/json");
+        if (token.has_value()) {
+            list = curl_slist_append(
+                list,
+                std::string("Authorization: Bearer " + token.value()).c_str());
+        }
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
-        nlohmann::json post_body;
-        for (const auto &pair : data) {
-            post_body[pair.first] = pair.second;
+        if (data.has_value()) {
+            nlohmann::json json;
+            for (const auto &pair : data.value()) {
+                json[pair.first] = pair.second;
+            }
+            set_post_body(json.dump());
+
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_body.c_str());
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, post_body.length());
+        } else {
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
         }
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_body.dump().c_str());
+
+        std::string buff;
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_get_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buff);
 
         CURLcode res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
             std::print(std::cerr, "Error performing post request.\n{}",
                        curl_easy_strerror(res));
+            response = "error";
+        } else {
+            response = buff;
         }
 
         curl_slist_free_all(list);
@@ -43,7 +64,7 @@ void CurlHelper::post_request(
 }
 
 void CurlHelper::get_request(const std::string &path,
-                             const std::string &token) {
+                             const std::optional<std::string> &token) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     CURLcode res;
@@ -55,6 +76,11 @@ void CurlHelper::get_request(const std::string &path,
 
         struct curl_slist *list = NULL;
         list = curl_slist_append(list, "User-Agent: Mozilla/5.0");
+        if (token.has_value()) {
+            list = curl_slist_append(
+                list,
+                std::string("Authorization: Bearer " + token.value()).c_str());
+        }
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
         std::string buff;
@@ -67,9 +93,9 @@ void CurlHelper::get_request(const std::string &path,
         if (res != CURLE_OK) {
             std::print(std::cerr, "Error performing GET request.\n{}",
                        curl_easy_strerror(res));
+            response = "error";
         } else {
-            std::print(std::cout, "Response:\n{}",
-                       nlohmann::json::parse(buff).dump(4));
+            response = buff;
         }
 
         curl_slist_free_all(list);
@@ -90,3 +116,7 @@ std::size_t CurlHelper::curl_get_callback(void *contents, std::size_t size,
                                               size * nmemb);
     return size * nmemb;
 }
+
+const std::string CurlHelper::get_response() { return response; }
+
+void CurlHelper::set_post_body(const std::string &body) { post_body = body; }

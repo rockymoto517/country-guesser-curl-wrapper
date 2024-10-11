@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 include(FetchContent)
 
-project(CurlHelper LANGUAGES CXX)
+project(CountryGame LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,9 +16,9 @@ file(GLOB SOURCES src/*.cpp src/*.hpp)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_executable(CurlHelper ${SOURCES})
+add_executable(CountryGame ${SOURCES})
 
 find_package(CURL CONFIG REQUIRED)
 
-target_link_libraries(CurlHelper PRIVATE CURL::libcurl)
-target_link_libraries(CurlHelper PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(CountryGame PRIVATE CURL::libcurl)
+target_link_libraries(CountryGame PRIVATE nlohmann_json::nlohmann_json)
