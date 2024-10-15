@@ -4,7 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 
-CountryGame::CountryGame() { curl = CurlHelper("http://localhost:5000"); }
+CountryGame::CountryGame() { curl = CurlHelper("http://172.19.112.1:5000"); }
 
 void CountryGame::sign_up(const std::string &username, const std::string &email,
                           const std::string &password) {

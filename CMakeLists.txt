@@ -15,6 +15,13 @@ file(GLOB SOURCES src/*.cpp src/*.hpp)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
+
+FetchContent_Declare(curl 
+	URL https://curl.se/download/curl-8.10.1.tar.xz
+	OVERRIDE_FIND_PACKAGE
+)
+FetchContent_MakeAvailable(curl)
+
 add_executable(CountryGame ${SOURCES})
 
 find_package(CURL CONFIG REQUIRED)

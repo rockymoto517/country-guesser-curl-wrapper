@@ -3,7 +3,7 @@
 #include <curl/curl.h>
 #include <curl/easy.h>
 
-#include <format>
+#include <cstdio>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -49,8 +49,8 @@ void CurlHelper::post_request(
 
         CURLcode res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            std::print(std::cerr, "Error performing post request.\n{}",
-                       curl_easy_strerror(res));
+            std::fprintf(stderr, "Error performing post request.\n%s\n",
+                         curl_easy_strerror(res));
             exit(EXIT_FAILURE);
         } else {
             response = buff;
@@ -91,8 +91,8 @@ void CurlHelper::get_request(const std::string &path,
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            std::print(std::cerr, "Error performing GET request.\n{}",
-                       curl_easy_strerror(res));
+            std::fprintf(stderr, "Error performing post request.\n%s\n",
+                         curl_easy_strerror(res));
             exit(EXIT_FAILURE);
         } else {
             response = buff;

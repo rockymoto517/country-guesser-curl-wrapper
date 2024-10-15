@@ -1,6 +1,5 @@
 #include "GameFunctions.hpp"
 
-#include <format>
 #include <iostream>
 #include <string>
 
@@ -100,7 +99,7 @@ void play_game(CountryGame &game) {
 
         game.play_turn(line);
         std::string hint = game.get_hint();
-        std::print(std::cout, "{}\n", hint);
+        std::printf("%s\n", hint.c_str());
 
         if (game.did_win()) {
             break;
