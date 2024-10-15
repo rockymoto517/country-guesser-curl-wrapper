@@ -51,7 +51,7 @@ void CurlHelper::post_request(
         if (res != CURLE_OK) {
             std::print(std::cerr, "Error performing post request.\n{}",
                        curl_easy_strerror(res));
-            response = "error";
+            exit(EXIT_FAILURE);
         } else {
             response = buff;
         }
@@ -93,7 +93,7 @@ void CurlHelper::get_request(const std::string &path,
         if (res != CURLE_OK) {
             std::print(std::cerr, "Error performing GET request.\n{}",
                        curl_easy_strerror(res));
-            response = "error";
+            exit(EXIT_FAILURE);
         } else {
             response = buff;
         }

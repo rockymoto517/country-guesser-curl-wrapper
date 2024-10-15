@@ -7,7 +7,7 @@ class CountryGame {
    private:
     std::optional<std::string> token;
     std::string game_id;
-    boolean win;
+    bool win;
     CurlHelper curl;
 
    public:
